@@ -43,4 +43,15 @@ public class UrlController {
         return ResponseEntity.created(uri).body(newSite);
     }
 
+    @GetMapping("/{id}")
+    public RedirectView acess(@PathVariable Long id) {
+        Optional<Url> link = repository.findById(id);
+        if (link.isPresent()) {
+            RedirectView redirect = new RedirectView();
+            redirect.setUrl(link.get().getLink());
+            return redirect;
+        }
+        return null;
+    }
+
 }
