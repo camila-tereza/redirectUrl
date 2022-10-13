@@ -43,6 +43,20 @@ public class UrlController {
         return ResponseEntity.created(uri).body(newSite);
     }
 
+    @PutMapping("/{id}")
+    @Transactional
+    public ResponseEntity<Url> updateUrl(@PathVariable Long id, @RequestBody Url newSite){
+        Optional<Url> url = repository.findById(id);
+
+        if(url.isPresent()){
+            url.get().setLink(newSite.getLink());
+            url.get().setName(newSite.getName());
+            return ResponseEntity.ok(url.get());
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
     @GetMapping("/{id}")
     public RedirectView acess(@PathVariable Long id) {
         Optional<Url> link = repository.findById(id);
