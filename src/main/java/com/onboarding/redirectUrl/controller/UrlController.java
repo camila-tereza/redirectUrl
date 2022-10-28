@@ -1,17 +1,17 @@
 package com.onboarding.redirectUrl.controller;
 
+import com.onboarding.redirectUrl.dto.UrlDto;
 import com.onboarding.redirectUrl.model.Url;
 import com.onboarding.redirectUrl.repository.UrlRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -36,28 +36,34 @@ public class UrlController {
 
     @PostMapping ("/create")
     @Transactional
-    public ResponseEntity<Url> createUrl(@RequestBody Url newSite, UriComponentsBuilder uriBuilder){
-        repository.save(newSite);
+    public ResponseEntity<UrlDto> createUrl(@RequestBody Url newSite, UriComponentsBuilder uriBuilder){
+        List<Url> temp = repository.findByName(newSite.getName());
 
-        URI uri =uriBuilder.path("/{name}").buildAndExpand(newSite.getName()).toUri();
-        return ResponseEntity.created(uri).body(newSite);
+        if (temp.isEmpty()){
+            repository.save(newSite);
+
+            URI uri =uriBuilder.path("/{name}").buildAndExpand(newSite.getName()).toUri();
+            return ResponseEntity.created(uri).body(new UrlDto(newSite));
+        }
+        return ResponseEntity.badRequest().build();
+
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("update/{id}")
     @Transactional
-    public ResponseEntity<Url> updateUrl(@PathVariable Long id, @RequestBody Url newSite){
+    public ResponseEntity<UrlDto> updateUrl(@PathVariable Long id, @RequestBody Url newSite){
         Optional<Url> url = repository.findById(id);
 
         if(url.isPresent()){
             url.get().setLink(newSite.getLink());
             url.get().setName(newSite.getName());
-            return ResponseEntity.ok(url.get());
+            return ResponseEntity.ok(new UrlDto(url.get()));
         }
 
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("acess/{id}")
     public RedirectView acess(@PathVariable Long id) {
         Optional<Url> link = repository.findById(id);
         if (link.isPresent()) {
