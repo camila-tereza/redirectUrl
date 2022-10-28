@@ -1,0 +1,118 @@
+openapi: 3.0.3
+info:
+  title: Redirect URL
+  description: |-
+    API para informar links a serem redirecionados quando buscados pelos ID's referentes.
+    
+    Os links, assim como seus nomes de referencia são cadastrados no sitema, e ao buscar pelos ID's na URL, o uauário é redirecionado para o link especifico.
+    
+    Esta API refere-se a uma atividade de progressão do Onboarding técnico da empresa Assertiva Soluções.
+
+  license: 
+    name: "Licença: GPLv3"
+    url: https://www.gnu.org/licenses/gpl-3.0.html
+  contact:
+    name: Email do desenvolvedor
+    email: camila.tereza@assertivasolucoes.com.br
+  version: 0.0.1
+externalDocs:
+  description: Planilha de progressão do Onboarding
+  url: https://docs.google.com/spreadsheets/d/1ZkqsjEPoZ7sASR67ZQLmYjX8zZ_1DPW5a8TevaqQi8E/edit?usp=sharing
+servers:
+  - url: https://localhost:8080/create
+  - url: https://localhost:8080/acess/{id}
+  - url: https://localhost:8080/update/{id}
+tags:
+  - name: redirect
+    description: Possiveis métodos da API
+    
+paths:
+  /create:
+    post:
+      tags:
+        - redirect
+      description: "Informar novas URLS e guarda-las no sistema"
+      operationId: createUrl
+      requestBody:
+        content:
+          application/json:
+            schema: 
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  link:
+                    type: string
+      responses:
+        201:
+          description: Criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Url"
+        400:
+          description: Este link já existe
+  
+  /acess/{id}:
+    get:
+      tags:
+        - redirect
+      description: Acessar Urls pelo ID
+      operationId: acessUrl
+      parameters: 
+      - name: id
+        in: path
+        schema:
+          type: integer
+        required: true
+      responses:
+        200:
+          description: Sucesso
+    
+  /update/{id}:
+    put:
+      tags:
+        - redirect
+      description: Atualiza dados das Urls pelo ID
+      operationId: updateUrl
+      parameters: 
+      - name: id
+        in: path
+        schema:
+          type: integer
+        required: true
+      responses:
+        200:
+          description: Sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Url"
+        404:
+          description: Url não encontrada
+          content:
+            application/json:
+              example: "Error"
+    
+components:
+  schemas:
+    Url:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10
+        name:
+          type: string
+          description: Nome que referencia o link
+          example: "Google"
+        link:
+          type: string
+          description: Link de acesso ao site
+          example: "https://www.google.com.br/"
