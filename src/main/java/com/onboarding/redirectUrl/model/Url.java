@@ -36,6 +36,10 @@ public class Url {
         return name;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public void setLink(String link) {
         this.link = link;
     }
